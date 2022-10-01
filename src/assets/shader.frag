@@ -1,3 +1,7 @@
+#ifdef GL_ES
+precision highp float;
+#endif
+
 precision highp float; 
 varying vec2 vTexCoord;
 uniform vec3 col;
