@@ -1,42 +1,46 @@
 import sv from "../assets/shader.vert";
 import sf from "../assets/shader.frag";
 
-// variables for Shader and createGraphics Canvas
-let sh, g;
-
 export default function Sketch(p5) {
+  // variables for Shader and createGraphics Canvas
+  let sh;
+
+  let prevImg, currImg;
+
+  let width = p5.windowWidth;
+  let height = p5.windowHeight;
+
   p5.preload = () => {
     // preload shader if you use separate .vert & .frag
     sh = p5.loadShader(sv, sf);
   };
 
   p5.setup = () => {
-    p5.createCanvas(p5.windowWidth, p5.windowHeight, p5.WEBGL);
-    g = p5.createGraphics(p5.windowWidth, p5.windowHeight, p5.WEBGL);
-    p5.noStroke();
+    p5.createCanvas(width, height, p5.WEBGL);
+    prevImg = p5.createGraphics(width, height);
+    prevImg.background(0);
+    prevImg.fill(255);
+    prevImg.ellipse(width / 2, height / 2, 40, 40);
+
+    currImg = p5.createGraphics(width, height, p5.WEBGL);
   };
 
   p5.draw = () => {
-    if (p5.frameCount < 2) {
-      g.noStroke();
-      g.shader(sh);
-      for (let i = 0; i < 8; i++) {
-        sh.setUniform("col", [p5.random(), p5.random(), p5.random()]);
-        g.rect(
-          -p5.width / 2 + (i * p5.width) / 8,
-          -p5.height / 2,
-          p5.width / 8,
-          p5.height
-        );
-      }
-    }
+    //update canvas here
+    currImg.shader(sh);
 
-    p5.background(220);
-    p5.texture(g);
-    p5.noStroke();
+    //we send the shader prevImg as a 2d texture so we can
+    //read the values inside the shader
+    sh.setUniform("u_prevtex", prevImg);
+    sh.setUniform("u_texsize", [prevImg.width, prevImg.height]);
 
-    p5.rotateX(p5.frameCount * 0.01);
-    p5.rotateY(p5.frameCount * 0.01);
-    p5.box(100, 100, 100);
+    //we need a rect for frag shader to draw onto
+    currImg.rect(-width / 2, -height / 2, width, height);
+
+    //copy the currImg and set it as previous
+    prevImg.image(currImg, 0, 0, width, height);
+
+    //show the results
+    p5.image(currImg, -width / 2, -height / 2, width, height);
   };
 }

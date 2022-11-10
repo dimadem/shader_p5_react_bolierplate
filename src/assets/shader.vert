@@ -1,16 +1,20 @@
 #ifdef GL_ES
-precision highp float;
+      precision highp float;
+      precision highp int;
 #endif
 
-attribute vec3 aPosition; 
-attribute vec2 aTexCoord; 
-varying vec2 vTexCoord; 
+// attributes, in
+attribute vec3 aPosition;
+attribute vec2 aTexCoord;
+
+// attributes, out
+varying vec2 var_vertTexCoord;
+
+// matrices
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 
 void main() {
-  vTexCoord = aTexCoord; 
-  vec4 positionVec4 = vec4(aPosition, 1.0); 
-  
-  gl_Position = uProjectionMatrix * uModelViewMatrix * positionVec4; 
+    var_vertTexCoord = aTexCoord; //Sending to frag
+    gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
 }
