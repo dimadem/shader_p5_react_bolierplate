@@ -1,11 +1,14 @@
-import sv from "../assets/shader.vert";
-import sf from "../assets/shader.frag";
+//https://itp-xstory.github.io/p5js-shaders/#/./docs/setting-up-shaders-in-p5
+
+import sv from "../assets/shader-milady.vert";
+import sf from "../assets/shader-milady.frag";
+import img from "../media/bg.png";
 
 export default function Sketch(p5) {
   // variables for Shader and createGraphics Canvas
   let sh;
 
-  let prevImg, currImg;
+  let currImg;
 
   let width = p5.windowWidth;
   let height = p5.windowHeight;
@@ -15,30 +18,20 @@ export default function Sketch(p5) {
     sh = p5.loadShader(sv, sf);
   };
 
+  // vert
   p5.setup = () => {
     p5.createCanvas(width, height, p5.WEBGL);
-    prevImg = p5.createGraphics(width, height);
-    prevImg.background(0);
-    prevImg.fill(255);
-    prevImg.ellipse(width / 2, height / 2, 40, 40);
-
-    currImg = p5.createGraphics(width, height, p5.WEBGL);
   };
 
+  // frag
   p5.draw = () => {
     //update canvas here
-    currImg.shader(sh);
+    p5.shader(sh);
 
-    //we send the shader prevImg as a 2d texture so we can
-    //read the values inside the shader
-    sh.setUniform("u_prevtex", prevImg);
-    sh.setUniform("u_texsize", [prevImg.width, prevImg.height]);
+    p5.setUniform("image", img);
 
     //we need a rect for frag shader to draw onto
-    currImg.rect(-width / 2, -height / 2, width, height);
-
-    //copy the currImg and set it as previous
-    prevImg.image(currImg, 0, 0, width, height);
+    p5.rect(-width / 2, -height / 2, width, height);
 
     //show the results
     p5.image(currImg, -width / 2, -height / 2, width, height);
